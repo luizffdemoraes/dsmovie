@@ -1,6 +1,8 @@
 package com.devsuperior.dsmovie.entities;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_movie")
@@ -13,6 +15,9 @@ public class Movie {
     private Double score;
     private Integer count;
     private String image;
+
+    @OneToMany(mappedBy = "id.movie") // Acessar todas as avaliações a partir de filme(movie)
+    private Set<Score> scores = new HashSet<>(); // Classe que implementa interface.
 
     public Movie(){
     }
@@ -64,4 +69,10 @@ public class Movie {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public Set<Score> getScores() {
+        return scores;
+    }
+
+
 }
