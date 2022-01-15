@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Service
 public class ScoreService {
 
@@ -28,34 +30,41 @@ public class ScoreService {
     public MovieDTO saveScore(ScoreDTO dto) {
 
         User user = userRepository.findByEmail(dto.getEmail());
-        if (user == null) {
+
+        if ( user == null )
+        {
             user = new User();
+
             user.setEmail(dto.getEmail());
+
             user = userRepository.saveAndFlush(user);
         }
-
+        
         Movie movie = movieRepository.findById(dto.getMovieId()).get();
 
         Score score = new Score();
+
         score.setMovie(movie);
         score.setUser(user);
         score.setValue(dto.getScore());
 
         score = scoreRepository.saveAndFlush(score);
 
+        Set<Score> scores = movie.getScores();
+
         double sum = 0.0;
-        for (Score s : movie.getScores()) {
-            sum = sum + s.getValue();
+
+        for (Score s : scores) {
+            sum += s.getValue();
         }
 
-        double avg = sum / movie.getScores().size();
+        double avg = sum / scores.size();
 
         movie.setScore(avg);
-        movie.setCount(movie.getScores().size());
+        movie.setCount(scores.size());
 
         movie = movieRepository.save(movie);
 
         return new MovieDTO(movie);
     }
-
 }
